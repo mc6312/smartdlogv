@@ -23,3 +23,4 @@ update:
 	$(packer) x -y $(backupdir)$(srcarcname)
 commit:
 	git commit -a -uno -m "$(version)"
+	@echo "не забудь сказать git push"

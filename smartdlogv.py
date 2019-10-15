@@ -30,7 +30,7 @@ from traceback import format_exception
 
 
 TITLE = 'Smartd Log Viewer'
-VERSION = '1.2.3'
+VERSION = '1.2.3-1'
 TITLE_VERSION = '%s v%s' % (TITLE, VERSION)
 
 RX_FNAME = re.compile(r'^attrlog\.(.*?)\..*?\.csv', re.UNICODE)
