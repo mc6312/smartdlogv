@@ -16,9 +16,18 @@ then
     exit 1
 fi
 
-logmsg "$LOGTAG" "parsing smartd log(s)..."
-if ! "`dirname $0`/smartdlogv.py" -r 2>&1 |mail "$MAILTO" -s "$MAILSUBJ"
+BUF="`mktemp`"
+trap 'rm -rf "$BUF"' EXIT
+
+logmsg "parsing smartd log(s)..."
+"`dirname $0`"/smartdlogv.py -r 2>&1 >"$BUF"
+EC=$?
+if [[ $EC != 0 ]]
 then
-    EC=$?
-    logmsg "error $EC parsing smartd log(s)"
+    logmsg "error parsing smartd log(s) - exit code is $EC"
+    exit $EC
 fi
+
+logmsg "sending mail..."
+cat "$BUF" |mail -s "$MAILSUBJ" "$MAILTO"
+logmsg "result is $?"
