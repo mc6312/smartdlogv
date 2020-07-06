@@ -30,7 +30,7 @@ from traceback import format_exception
 
 
 TITLE = 'Smartd Log Viewer'
-VERSION = '1.2.3-2'
+VERSION = '1.2.3-3'
 TITLE_VERSION = '%s v%s' % (TITLE, VERSION)
 
 RX_FNAME = re.compile(r'^attrlog\.(.*?)\..*?\.csv', re.UNICODE)
@@ -490,7 +490,7 @@ def main():
 
                 parselist.append((os.path.join(LOG_DIR, fname.filename), devname))
 
-        for fpath, devname in parselist:
+        for fpath, devname in sorted(parselist, key=lambda r: r[1].filename):
             try:
                 log = SMART_Log(fpath, devname, onlyAttrs, cmdargs.short)
 
