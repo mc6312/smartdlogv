@@ -3,7 +3,7 @@
 
 """ smartdlogv.py
 
-    Copyright 2019 mc6312
+    Copyright 2019-2020 mc6312
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License version 3
@@ -30,7 +30,7 @@ from traceback import format_exception
 
 
 TITLE = 'Smartd Log Viewer'
-VERSION = '1.2.3-3'
+VERSION = '1.2.4'
 TITLE_VERSION = '%s v%s' % (TITLE, VERSION)
 
 RX_FNAME = re.compile(r'^attrlog\.(.*?)\..*?\.csv', re.UNICODE)
@@ -178,14 +178,6 @@ class SMART_Log():
         if shorten and loglen > MAX_LOG_RECORDS:
             # ...удаляем лишние записи...
             del self.log[1:-(MAX_LOG_RECORDS - 1)]
-
-            # ...и пересчитываем дельты для оставшихся
-            lastvalues = self.log[0].attrs
-
-            for rec in self.log[1:]:
-                for nattr in rec.attrs:
-                    if nattr in lastvalues:
-                        rec.attrs[nattr].compute_deltas(lastvalues[nattr])
 
     def print_table(self):
         """Вывод в stdout содержимого журнала в виде текстовой таблицы."""
