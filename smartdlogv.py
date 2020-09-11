@@ -64,10 +64,11 @@ smart_log_rec = namedtuple('smart_log_rec', 'timestamp attrs')
 
 class smart_attr():
     """Значения атрибута, где:
-value     - нормализованное значение атрибута
-valdelta  - разница с предыдущим нормализованным значением
-raw       - необработанное значение атрибута
-rawdelta  - разница с предыдущим необработанным значением"""
+    value     - нормализованное значение атрибута
+    valdelta  - разница с предыдущим нормализованным значением
+    raw       - необработанное значение атрибута
+    rawdelta  - разница с предыдущим необработанным значением"""
+
     __slots__ = 'value', 'valdelta', 'raw', 'rawdelta'
 
     def __init__(self, v, vd, r, rd):
@@ -103,9 +104,7 @@ class SMART_Log():
                       только указанные в нём атрибуты,
         shorten     - сократить лог до MAX_LOG_RECORDS.
 
-        В списке log сохранется список экземпляров smart_log_rec,
-        а значения - словари, в которых ключи - номера атрибутов, а значения -
-        экземпляры smart_attr."""
+        В списке log сохранется список экземпляров smart_log_rec."""
 
         self.log = []
         self.devname = devname
@@ -508,4 +507,5 @@ def main():
 
 
 if __name__ == '__main__':
+    sys.argv += ['-f', 'attrlog.WDC_WD5003ABYX_01WERA2-WD_WMAYP6991938.ata.csv']
     sys.exit(main())
