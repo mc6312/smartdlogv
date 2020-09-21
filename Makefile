@@ -24,3 +24,7 @@ update:
 commit:
 	git commit -a -uno -m "$(version)"
 	@echo "не забудь сказать git push"
+show-branch:
+	@echo "$(branch)"
+profile:
+	python3 __profile.py |less

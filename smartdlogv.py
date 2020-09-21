@@ -30,7 +30,7 @@ from traceback import format_exception
 
 
 TITLE = 'Smartd Log Viewer'
-VERSION = '1.2.4'
+VERSION = '1.2.4.1-dev'
 TITLE_VERSION = '%s v%s' % (TITLE, VERSION)
 
 RX_FNAME = re.compile(r'^attrlog\.(.*?)\..*?\.csv', re.UNICODE)
@@ -109,15 +109,30 @@ class SMART_Log():
         self.log = []
         self.devname = devname
         self.nrawrecords = 0
+        self.fpath = fpath
+        self.onlyAttrs = onlyAttrs
+        self.shorten = shorten
 
+        self.__parse_log()
+
+    def __parse_log(self):
         # ключи - номера атрибутов, значения - экземпляры smart_attr
         # для сравнения с очередными прочитанными из лога и для вычисления дельты
         lastvalues = dict()
 
         firstrecord = True
 
-        with open(fpath, 'r') as f:
+        with open(self.fpath, 'r') as f:
             csvf = csv.reader(f, delimiter=';')
+
+            def __prep_rec(ixrec, ixattr, sattrv):
+                #DEBUG: вынесено в функцию для просмотра результатов cProfile
+                try:
+                    nattr, nvalue, nraw = map(lambda s: int(s.strip()), sattrv)
+                except ValueError:
+                    raise ValueError('Invalid attribute(s) in group #%d at record #%d of file "%s"' % (ixattr, ixrec, self.fpath))
+
+                return nattr in self.onlyAttrs, smart_attr(nvalue, 0, nraw, 0), nattr
 
             for ixrec, rec in enumerate(csvf, 1):
                 #
@@ -140,16 +155,9 @@ class SMART_Log():
 
                 # группы по три целых числа - attribute, value, raw value
                 for ixattr, sattrv in enumerate(zip(*[iter(rec[1:-1])]*3), 1):
-                    try:
-                        nattr, nvalue, nraw = map(lambda s: int(s.strip()), sattrv)
-                    except ValueError:
-                        raise ValueError('Invalid attribute(s) in group #%d at record #%d of file "%s"' % (ixattr, ixrec, fpath))
-
-                    # отбрасываем ненужные атрибуты
-                    if nattr not in onlyAttrs:
+                    ok, curattr, nattr = __prep_rec(ixrec, ixattr, sattrv)
+                    if not ok:
                         continue
-
-                    curattr = smart_attr(nvalue, 0, nraw, 0)
 
                     if nattr in lastvalues:
                         if curattr.compute_deltas(lastvalues[nattr]):
@@ -174,7 +182,7 @@ class SMART_Log():
         # если требуется сокращённый журнал...
         #
         loglen = len(self.log)
-        if shorten and loglen > MAX_LOG_RECORDS:
+        if self.shorten and loglen > MAX_LOG_RECORDS:
             # ...удаляем лишние записи...
             del self.log[1:-(MAX_LOG_RECORDS - 1)]
 
@@ -507,5 +515,4 @@ def main():
 
 
 if __name__ == '__main__':
-    sys.argv += ['-f', 'attrlog.WDC_WD5003ABYX_01WERA2-WD_WMAYP6991938.ata.csv']
     sys.exit(main())
